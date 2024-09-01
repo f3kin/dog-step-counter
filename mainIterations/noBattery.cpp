@@ -33,6 +33,8 @@ int step_size = 200;
 int active_axis = 0, interval = 500000;
 int step_changed = 0;
 
+#define PIN_LED_YELLOW   4
+#define PIN_LED_RED      2
 
 bool ledReadOn = true;
 bool bluetoothConnected = true;
@@ -45,18 +47,34 @@ float mapping(float x, float in_min, float in_max, float out_min, float out_max)
 }
 
 void setup(void) {
-
+  pinMode(PIN_LED_YELLOW, OUTPUT);
+  pinMode(PIN_LED_RED, OUTPUT);
+  
   Serial.begin(115200);
   while (!Serial) {
     delay(10); // will pause Zero, Leonardo, etc until serial console opens
   }
 
+  digitalWrite(PIN_LED_YELLOW, HIGH); // turn the LED on
+  digitalWrite(PIN_LED_RED, HIGH);    // turn the LED on
+
+  // Bluetooth receive config Information
+  while (bluetoothConnected) {
+    delay(1000);
+    digitalWrite(PIN_LED_RED, LOW); // turn the LED off
+    break;
+  }
+
+  // config WiFi
+  commSetup();
+
+  digitalWrite(PIN_LED_YELLOW, LOW); // turn the LED off
 
   // Try to initialize!
   if (!mpu.begin()) {
+    Serial.println("Failed to find MPU6050 chip");
     while (1) {
-      Serial.println("Failed to find MPU6050 chip");
-      delay(1000);
+      delay(10);
     }
   }
   Serial.println("MPU6050 Found!");
@@ -261,5 +279,22 @@ void loop() {
   step_counter();
   // Serial.println("Calling step Counter");
   // }
+  vTaskDelay(10 / portTICK_PERIOD_MS);
 
+  if (handleLoop()) {
+    digitalWrite(PIN_LED_YELLOW, HIGH); // turn the LED on
+  } else {
+    digitalWrite(PIN_LED_YELLOW, LOW); // turn the LED on
+  }
+
+  if (ledReadOn) {
+    ledReadOn = false;
+    digitalWrite(PIN_LED_RED, LOW); // turn the LED red Off
+  }
+
+  while (readBattery() < MIN_BATTERY_VOLTAGE) {
+    ledReadOn = true;
+    digitalWrite(PIN_LED_YELLOW, LOW); // turn the LED red Off
+    digitalWrite(PIN_LED_RED, HIGH);   // turn the LED on
+  }
 }
