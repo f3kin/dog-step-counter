@@ -248,4 +248,8 @@ void step_counter() {
 
 void loop() {
   step_counter();
+  vTaskDelay(10 / portTICK_PERIOD_MS);
+  if (handleLoop()) {
+    Serial.println("Data Success");
+  }
 }

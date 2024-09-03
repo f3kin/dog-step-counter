@@ -9,18 +9,20 @@
 #include <WiFiUdp.h>
 #include <time.h>
 
-const char* ssid = "Pensionato";
-const char* password = "492306pp";
+// CHANGE TO MY WIFI
+const char* ssid = "Aussie Broadband 5699";
+const char* password = "Nahfyscfnu";
 const char* id_token = "c8571e53-1af7-4fd1-aca4-bd77941d8a5e";
 
-const char* ntpServer = "pool.ntp.org";
-const char* ntpServer1 = "1.br.pool.ntp.org";
-const char* ntpServer2 = "2.br.pool.ntp.org";
-const long gmtOffset_sec = -3600 * 3;
-const int daylightOffset_sec = 0;
+// CHANGE TO AUSTRALIAN SERVERS - Done
+const char* ntpServer = "au.pool.ntp.org";
+const char* ntpServer1 = "1.au.pool.ntp.org";
+const char* ntpServer2 = "2.au.pool.ntp.org";
+const long gmtOffset_sec = 3600 * 11;  // GMT+11 for AEDT
+const int daylightOffset_sec = 0;  // No additional offset needed during daylight saving
 char timeStringBuff[50];
 
-// Lets Encrypt Root Certificate (Self Signed)
+// CHANGE THIS TO MY SERVER CERTIFICATE
 static const char* root_ca = "-----BEGIN CERTIFICATE-----\n"
                              "MIIDdzCCAl+gAwIBAgIEAgAAuTANBgkqhkiG9w0BAQUFADBaMQswCQYDVQQGEwJJ\n"
                              "RTESMBAGA1UEChMJQmFsdGltb3JlMRMwEQYDVQQLEwpDeWJlclRydXN0MSIwIAYD\n"
@@ -43,6 +45,7 @@ static const char* root_ca = "-----BEGIN CERTIFICATE-----\n"
                              "R9I4LtD+gdwyah617jzV/OeBHRnDJELqYzmp\n"
                              "-----END CERTIFICATE-----\n";
 
+// CHANGE TO MY OWN SERVER
 const char* serverName = "https://petrepet-back.onrender.com/historic";
 
 bool getCurrentTimeStamp() {
