@@ -1,5 +1,5 @@
-#ifndef COMMUNICATION_H
-#define COMMUNICATION_H
+#ifndef DOGSTEP_COMMUNICATION_H
+#define DOGSTEP_COMMUNICATION_H
 
 #include <WiFi.h>
 #include <WebServer.h>
@@ -71,7 +71,7 @@ char buffer[250];
 // Web server
 
 // global counter
-
+uint32_t step_count = 0;
 
 inline void create_json(uint32_t stepsAmount) {
   // Clear and fill json

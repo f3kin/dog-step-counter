@@ -1,52 +1,23 @@
-#ifndef COMMUNICATION_H
-#define COMMUNICATION_H
+#ifndef MYCOMMS_H
+#define MYCOMMS_H
 
-#include <WiFi.h>
 #include <WebServer.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <AsyncUDP.h>
 #include <WiFiUdp.h>
 #include <time.h>
+#include <Arduino.h>
+#include <WiFi.h>
 
-// CHANGE TO MY WIFI
-const char* ssid = "Aussie Broadband 5699";
-const char* password = "Nahfyscfnu";
-const char* id_token = "c8571e53-1af7-4fd1-aca4-bd77941d8a5e";
-
-// CHANGE TO AUSTRALIAN SERVERS - Done
+//***************  Determine the time ***************//
+const char* id_token = getenv("ID_TOKEN");
 const char* ntpServer = "au.pool.ntp.org";
 const char* ntpServer1 = "1.au.pool.ntp.org";
 const char* ntpServer2 = "2.au.pool.ntp.org";
 const long gmtOffset_sec = 3600 * 11;  // GMT+11 for AEDT
 const int daylightOffset_sec = 0;  // No additional offset needed during daylight saving
 char timeStringBuff[50];
-
-// CHANGE THIS TO MY SERVER CERTIFICATE
-// static const char* root_ca = "-----BEGIN CERTIFICATE-----\n"
-//                              "MIIDdzCCAl+gAwIBAgIEAgAAuTANBgkqhkiG9w0BAQUFADBaMQswCQYDVQQGEwJJ\n"
-//                              "RTESMBAGA1UEChMJQmFsdGltb3JlMRMwEQYDVQQLEwpDeWJlclRydXN0MSIwIAYD\n"
-//                              "VQQDExlCYWx0aW1vcmUgQ3liZXJUcnVzdCBSb290MB4XDTAwMDUxMjE4NDYwMFoX\n"
-//                              "DTI1MDUxMjIzNTkwMFowWjELMAkGA1UEBhMCSUUxEjAQBgNVBAoTCUJhbHRpbW9y\n"
-//                              "ZTETMBEGA1UECxMKQ3liZXJUcnVzdDEiMCAGA1UEAxMZQmFsdGltb3JlIEN5YmVy\n"
-//                              "VHJ1c3QgUm9vdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKMEuyKr\n"
-//                              "mD1X6CZymrV51Cni4eiVgLGw41uOKymaZN+hXe2wCQVt2yguzmKiYv60iNoS6zjr\n"
-//                              "IZ3AQSsBUnuId9Mcj8e6uYi1agnnc+gRQKfRzMpijS3ljwumUNKoUMMo6vWrJYeK\n"
-//                              "mpYcqWe4PwzV9/lSEy/CG9VwcPCPwBLKBsua4dnKM3p31vjsufFoREJIE9LAwqSu\n"
-//                              "XmD+tqYF/LTdB1kC1FkYmGP1pWPgkAx9XbIGevOF6uvUA65ehD5f/xXtabz5OTZy\n"
-//                              "dc93Uk3zyZAsuT3lySNTPx8kmCFcB5kpvcY67Oduhjprl3RjM71oGDHweI12v/ye\n"
-//                              "jl0qhqdNkNwnGjkCAwEAAaNFMEMwHQYDVR0OBBYEFOWdWTCCR1jMrPoIVDaGezq1\n"
-//                              "BE3wMBIGA1UdEwEB/wQIMAYBAf8CAQMwDgYDVR0PAQH/BAQDAgEGMA0GCSqGSIb3\n"
-//                              "DQEBBQUAA4IBAQCFDF2O5G9RaEIFoN27TyclhAO992T9Ldcw46QQF+vaKSm2eT92\n"
-//                              "9hkTI7gQCvlYpNRhcL0EYWoSihfVCr3FvDB81ukMJY2GQE/szKN+OMY3EU/t3Wgx\n"
-//                              "jkzSswF07r51XgdIGn9w/xZchMB5hbgF/X++ZRGjD8ACtPhSNzkE1akxehi/oCr0\n"
-//                              "Epn3o0WC4zxe9Z2etciefC7IpJ5OCBRLbf1wbWsaY71k5h+3zvDyny67G7fyUIhz\n"
-//                              "ksLi4xaNmjICq44Y3ekQEe5+NauQrz4wlHrQMz2nZQ/1/I6eYs9HRCwBXbsdtTLS\n"
-//                              "R9I4LtD+gdwyah617jzV/OeBHRnDJELqYzmp\n"
-//                              "-----END CERTIFICATE-----\n";
-
-// CHANGE TO MY OWN SERVER
-const char* serverName = "http://192.168.20.41:5000/endpoint";
 
 bool getCurrentTimeStamp() {
   struct tm timeInfo;
@@ -64,14 +35,9 @@ bool getCurrentTimeStamp() {
   return getTimer;
 }
 
-// JSON data buffer
+//***************  Generate JSON Payload ****************//
 StaticJsonDocument<250> jsonDocument;
 char buffer[250];
-
-// Web server
-
-// global counter
-
 
 inline void create_json(uint32_t stepsAmount) {
   // Clear and fill json
@@ -82,6 +48,28 @@ inline void create_json(uint32_t stepsAmount) {
 
   serializeJson(jsonDocument, buffer);
 }
+
+unsigned long lastTime = 0;
+unsigned long timerDelay = 10000;
+
+
+
+///***************  Send data to server ****************//
+
+bool send_data_to_server(uint32_t stepsAmount) {
+    bool ret = false;
+    create_json(stepsAmount);
+    HTTPClient http;
+    WiFiClient client;
+    http.begin(getenv("SERVER_NAME"));
+    http.addHeader("Content-Type", "application/json");
+    int responseCode = http.POST(buffer);
+    http.end();
+    ret = true;
+    return ret;
+}
+
+/* INTEGRATE THE FOLLOWING CODE
 
 unsigned long lastTime = 0;
 unsigned long timerDelay = 10000;
@@ -138,16 +126,6 @@ inline void setup_wifi() {
   //  Your Domain name with URL path or IP address with path
   // http.begin(serverName, root_ca);
   http.begin(serverName);
-}
-//////////////// WIFI CONFIGURATION ////////////////
+}*/
 
-//////////////// API CONFIGURATION ////////////////
-
-inline void commSetup() {
-  setup_wifi();
-}
-
-inline bool handleLoop() {
-  return send_data_to_server();
-}
-#endif /* DOGSTEP_COMMUNICATION_H */
+#endif
