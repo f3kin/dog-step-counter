@@ -49,83 +49,42 @@ inline void create_json(uint32_t stepsAmount) {
   serializeJson(jsonDocument, buffer);
 }
 
-unsigned long lastTime = 0;
-unsigned long timerDelay = 10000;
-
-
 
 ///***************  Send data to server ****************//
 
+// Add time delay functionality
+unsigned long lastTime = 0;
+unsigned long timerDelay = 10000;
+
 bool send_data_to_server(uint32_t stepsAmount) {
     bool ret = false;
-    create_json(stepsAmount);
-    HTTPClient http;
-    WiFiClient client;
-    http.begin(getenv("SERVER_NAME"));
-    http.addHeader("Content-Type", "application/json");
-    int responseCode = http.POST(buffer);
-    http.end();
-    ret = true;
+    
+
+    if ((millis() - lastTime) >= timerDelay) {
+      if (WiFi.status() == WL_CONNECTED && getCurrentTimeStamp()) {
+        // Setup HTTP client
+        HTTPClient http;
+        WiFiClient client;
+        http.begin(getenv("SERVER_NAME"));
+        http.addHeader("Content-Type", "application/json");
+
+        // Create JSON payload and send
+        create_json(stepsAmount);
+        int responseCode = http.POST(buffer);
+        http.end();
+
+        // Check the Post was successful
+        if (responseCode == 201) {
+          Serial.println("Post successful");
+          ret = true;
+        }
+        else{
+          Serial.println("Post failed");
+        } 
+      }
+    }
     return ret;
 }
 
-/* INTEGRATE THE FOLLOWING CODE
-
-unsigned long lastTime = 0;
-unsigned long timerDelay = 10000;
-HTTPClient http;
-WiFiClient client;
-
-inline bool send_data_to_server() {
-  bool ret = false;
-  if ((millis() - lastTime) >= timerDelay) {
-    // Check WiFi connection status
-    if (WiFi.status() == WL_CONNECTED && getCurrentTimeStamp()) {
-      http.addHeader("Content-Type", "application/json");
-      int current_steps = step_count;
-      create_json(current_steps);
-      Serial.print("Post pedometer: ");
-      Serial.println(current_steps);
-      int httpResponseCode = http.POST(buffer);
-
-      Serial.print("HTTP Response code: ");
-      Serial.println(http.errorToString(httpResponseCode));
-      Serial.println(httpResponseCode);
-      Serial.println(buffer);
-
-      if (httpResponseCode == 201) {
-        Serial.println("Post successful");
-        step_count = step_count - current_steps;
-        ret = true;
-      } else {
-        ret = false;
-      }
-    } else {
-      Serial.println("WiFi Disconnected");
-      ret = false;
-    }
-    lastTime = millis();
-  }
-  return ret;
-}
-
-inline void setup_wifi() {
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.println("Connecting to WiFi..");
-  }
-  Serial.println("Connected to the WiFi network");
-  Serial.println("IP Address: ");
-  Serial.println(WiFi.localIP());
-
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer, ntpServer1, ntpServer2);
-  getCurrentTimeStamp();
-
-  //  Your Domain name with URL path or IP address with path
-  // http.begin(serverName, root_ca);
-  http.begin(serverName);
-}*/
 
 #endif

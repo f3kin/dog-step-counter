@@ -8,3 +8,8 @@ Dog step counting system for monitoring physical activity and pet disposition, b
 
 # Dependencies
 The step counting algorithm with the mpu6050 was based on the available open-source implementation [Move Your Body](https://github.com/gabrielbvicari/myb)
+
+
+# Run scripts
+source ~/.platformio/penv/bin/activate
+pio run -v

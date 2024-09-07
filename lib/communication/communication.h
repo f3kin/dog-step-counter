@@ -9,10 +9,6 @@
 #include <WiFiUdp.h>
 #include <time.h>
 
-// CHANGE TO MY WIFI
-const char* ssid = "Aussie Broadband 5699";
-const char* password = "Nahfyscfnu";
-const char* id_token = "c8571e53-1af7-4fd1-aca4-bd77941d8a5e";
 
 // CHANGE TO AUSTRALIAN SERVERS - Done
 const char* ntpServer = "au.pool.ntp.org";

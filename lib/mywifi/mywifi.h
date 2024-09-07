@@ -4,9 +4,13 @@
 #include <Arduino.h>
 #include <WiFi.h>
 
+// const char* ssid = "Aussie Broadband 5699";  // Hardcoded for testing
+// const char* password = "Nahfyscfnu";
 
-const char* ssid = getenv("SSID");
-const char* password = getenv("PASSWORD");
+const char* ssid = PLATFORMIO_MY_WIFI_SSID;
+const char* password = PLATFORMIO_MY_WIFI_PASSWORD;
+const char* serverUrl = PLATFORMIO_MY_SERVER_URL;
+const char* idToken = PLATFORMIO_MY_ID_TOKEN;
 
 void wifi_setup() {
   Serial.println("WiFi Connection Test");
