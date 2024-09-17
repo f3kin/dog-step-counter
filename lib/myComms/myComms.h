@@ -65,16 +65,20 @@ bool send_data_to_server(uint32_t stepsAmount) {
         // Setup HTTP client
         HTTPClient http;
         WiFiClient client;
-        http.begin(getenv("SERVER_NAME"));
+        Serial.println("Server URL test");
+        Serial.println(serverUrl);
+        http.begin(serverUrl);
         http.addHeader("Content-Type", "application/json");
 
         // Create JSON payload and send
         create_json(stepsAmount);
         int responseCode = http.POST(buffer);
         http.end();
+        Serial.print("HTTP Response code: ");
+        Serial.println(responseCode);
 
         // Check the Post was successful
-        if (responseCode == 201) {
+        if (responseCode == 200) {
           Serial.println("Post successful");
           ret = true;
         }

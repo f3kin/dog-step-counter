@@ -4,13 +4,11 @@
 #include <Arduino.h>
 #include <WiFi.h>
 
-// const char* ssid = "Aussie Broadband 5699";  // Hardcoded for testing
-// const char* password = "Nahfyscfnu";
-
-const char* ssid = PLATFORMIO_MY_WIFI_SSID;
-const char* password = PLATFORMIO_MY_WIFI_PASSWORD;
-const char* serverUrl = PLATFORMIO_MY_SERVER_URL;
-const char* idToken = PLATFORMIO_MY_ID_TOKEN;
+//TODO: Remove hardcoding
+const char* ssid = "Aussie Broadband 5699";
+const char* password = "Nahfyscfnu";
+const char* serverUrl = "http://192.168.20.14:5000/";
+const char* idToken = "c8571e53-1af7-4fd1-aca4-bd77941d8a5e";
 
 void wifi_setup() {
   Serial.println("WiFi Connection Test");
